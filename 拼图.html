@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="utf-8">
+        <title>拼图</title>
+
+        <style>
+        	body{
+        		text-align: center;
+        		background: url("./img/bg.jpg");
+        	}
+        	div{
+        		height: 160px;
+        	}
+        	img{
+        		width: 150px;
+        		height: 150px;
+        		margin: 0 10px;
+        	}
+        	.selected{
+        		width: 160px;
+        		height: 160px;
+        		border-radius: 50%;
+        		box-shadow: 10px 10px 5px #888888;
+        		
+        	}
+        	img:hover{
+        		
+        		animation: selectpic 1s;
+        		-webkit-animation: selectpic 1s;
+        		animation-iteration-count: infinite;
+        		-webkit-animation-iteration-count: infinite;
+        		animation-timing-function: linear;
+        		-webkit-animation-timing-function: linear;
+        	}
+        	
+        	@keyframes selectpic{
+        		0%{ transform: rotate(0deg) }
+        		25%{ transform: rotate(90deg) }
+        		50%{ transform: rotate(180deg) }
+        		75%{ transform: rotate(270deg) }
+        		100%{ transform: rotate(360deg) }
+        	}
+        	@-webkit-keyframes selectpic{
+        		0%{ -webkit-transform: rotate(180deg) }
+        		25%{ -webkit-transform: rotate(90deg) }
+        		50%{ -webkit-transform: rotate(180deg) }
+        		75%{ -webkit-transform: rotate(270deg) }
+        		100%{ -webkit-transform: rotate(360deg) }
+        	}
+        </style>
+    </head>
+
+    <body onkeydown="keydown(event)">
+    	<h1>拼 图</h1>
+    	<div>
+    		<img src="img/001.jpg" onclick="selectPic(this)" class="selected"/>
+			<img src="img/002.jpg" onclick="selectPic(this)"/>
+			<img src="img/003.jpg" onclick="selectPic(this)"/>
+			<img src="img/004.jpg" onclick="selectPic(this)"/>
+			<img src="img/005.jpg" onclick="selectPic(this)"/>
+    	</div>
+        <canvas id="myCanvas" width="1000" height="600">您的浏览器不支持 HTML5 canvas 标签。</canvas>
+        <script>
+        	function selectPic(pic){
+        		if(hasClass(pic, 'selected')){
+        			return;
+        		}
+        		addClass(pic, 'selected');
+        		imgSrc = pic.src;
+        		startGame();
+        		var b = pic.parentNode.children;
+        		for(var i = 0; i < b.length; i++){
+        			if(b[i] !== pic){
+        				removeClass(b[i], "selected");
+        			}
+        		}
+        	}
+        	
+        	/***************/
+        	function hasClass( elements,cName ){  
+			    return !!elements.className.match( new RegExp( "(\\s|^)" + cName + "(\\s|$)") ); 
+			};  
+			function addClass( elements,cName ){  
+			    if( !hasClass( elements,cName ) ){  
+			        elements.className += " " + cName;  
+			    };  
+			};  
+			function removeClass( elements,cName ){  
+			    if( hasClass( elements,cName ) ){  
+			        elements.className = elements.className.replace( new RegExp( "(\\s|^)" + cName + "(\\s|$)" ), " " );
+			    }; 
+			};
+			/***************/
+        	
+        	var arr = [
+        		[3,2,1],
+        		[6,7,0],
+        		[5,8,4]
+        	];
+        	var step = 0;
+        	var imgSrc = "img/001.jpg";
+        	
+        	function getContext(id){
+            	var canvas = document.getElementById(id);
+            	var context = canvas.getContext("2d");
+            	if(context == null){
+            		return false;
+            	}
+            	return context;
+        	
+        	}
+        	
+            function draw(id){
+            	var context = getContext(id);
+	        	var image = new Image();
+	        	image.src = imgSrc;
+            	image.onload = function () {
+	                 context.drawImage(image,0,100);
+	            }
+	            context.clearRect(0,0,100,80);
+				context.font = "50px Courier New";
+            	context.fillText("行走步数: ", 0, 80);
+            }
+            
+            
+            function drawSplitImg(){
+            	var context = getContext("myCanvas");
+            	context.clearRect(235, 20, 200, 80);
+				context.font = "55px Courier New";
+            	context.fillText(step, 240, 80);
+				
+            	for(var i = 0; i < arr.length; i++){
+            		for(var j = 0; j < arr[i].length; j++){
+            			if(arr[i][j] === 8){
+            				context.clearRect(j*155 + 500, i*155 + 100, 150, 150);
+            				continue;
+            			}
+            			var m = Math.floor(arr[i][j]/3);
+            			var n = arr[i][j]%3;
+            			(function(m,n,i,j){
+            				var image = new Image();
+            				//image.src = "img/" + (m*3 + n) + ".jpg";
+							image.src = imgSrc;
+            				//context.save();
+            				image.onload = function(){
+            					context.drawImage(image,m*150,n*150,150,150,j*155 + 500,i*155 + 100,150,150);
+            				//	context.restore();
+            				}
+            			})(m,n,i,j);
+            		}
+            	}
+            	if(isComplete() === true){
+            		var context = getContext("myCanvas");
+            		context.fillStyle = "Red";
+					context.font = "55px Courier New";
+	            	context.fillText("COMPLETE", 400, 80);
+            	}
+            }
+            
+            function keydown(event){
+            	if(isComplete() === true){
+            		return;
+            	}
+        		if(event.which === 37){//left
+        			moveLEFT();
+        		}
+        		if(event.which === 38){//up
+        			moveUP();
+        		}
+        		if(event.which === 39){//right
+        			moveRIGHT();
+        		}
+        		if(event.which === 40){//down
+        			moveDOWN();
+        		}
+        	}
+            
+            function moveLEFT(){
+            	var pos = getMovePos();
+            	var i = Math.floor(pos/3);
+            	var j = pos%3;
+            	if(j === 2){
+            		return;
+            	}
+            	arr[i][j] = arr[i][j+1];
+            	arr[i][j+1] = 8;
+            	step++;
+            	drawSplitImg();
+            }
+            function moveUP(){
+            	var pos = getMovePos();
+            	var i = Math.floor(pos/3);
+            	var j = pos%3;
+            	if(i === 2){
+            		return;
+            	}
+            	arr[i][j] = arr[i+1][j];
+            	arr[i+1][j] = 8;
+            	step++;
+            	drawSplitImg();
+            }
+            function moveRIGHT(){
+            	var pos = getMovePos();
+            	var i = Math.floor(pos/3);
+            	var j = pos%3;
+            	if(j === 0){
+            		return;
+            	}
+            	arr[i][j] = arr[i][j-1];
+            	arr[i][j-1] = 8;
+            	step++;
+            	drawSplitImg();
+            }
+            function moveDOWN(){
+            	var pos = getMovePos();
+            	var i = Math.floor(pos/3);
+            	var j = pos%3;
+            	if(i === 0){
+            		return;
+            	}
+            	arr[i][j] = arr[i-1][j];
+            	arr[i-1][j] = 8;
+            	step++;
+            	drawSplitImg();
+            }
+            
+            function getMovePos(){
+            	for(var i = 0; i < arr.length; i++){
+            		for(var j = 0; j < arr[i].length; j++){
+            			if(arr[i][j] === 8){
+            				return i*3+j;
+            			}
+            		}
+            	}
+            }
+            
+            function createArr(){
+            	var temp = [0,1,2,3,4,5,6,7,8];
+            	for(var i = 0; i < 4; i++){
+            		var m = Math.floor(Math.random()*8);
+					var n = Math.floor(Math.random()*8);
+					var t = temp[m];
+					temp[m] = temp[n];
+					temp[n] = t;
+            	}
+            	for(var i = 0; i < 9; i++){
+            		var m = Math.floor(i/3);
+            		var n = i%3;
+            		arr[m][n] = temp[i];
+            	}
+            }
+            
+            function isComplete(){
+            	for(var i = 0; i < arr.length; i++){
+            		for(var j = 0; j < arr[i].length; j++){
+            			if(arr[i][j] !== (j*3 + i)){
+            				return false;
+            			}
+            		}
+            	}
+            	return true;
+            }
+            
+            
+            function startGame(){
+            	draw("myCanvas");
+            	step = 0;
+            	createArr();
+            	drawSplitImg();
+            }
+            
+            startGame();
+        </script>
+    </body>
+
+</html>

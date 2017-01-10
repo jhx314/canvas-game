@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>2048</title>
+
+        <style>
+        	body{
+				text-align: center;
+				background: url("./img/bg.jpg");
+			}
+			.left{
+				width: 400px;
+				margin: 0 auto;
+				text-align: left;
+			}
+        </style>
+    </head>
+    <body onkeydown="keydown(event)">
+    	<h1>2048</h1>
+    	<hr/>
+    	<div class="left">
+	    	操作：<br/>
+	    	&nbsp;&nbsp; up: ↑ 向上<br/>
+	    	&nbsp;&nbsp; down: ↓ 向下<br/>
+	    	&nbsp;&nbsp; left: ← 向左<br/>
+	    	&nbsp;&nbsp; right: → 向右<br/>
+    	</div>
+    	<hr/>
+        <canvas id="myCanvas" class="center" width="400" height="400" >您的浏览器不支持 HTML5 canvas 标签。</canvas>
+        <script>
+        	function keydown(event){
+        		if(stop){
+        			return false;
+        		}
+        		
+        		if(event.which === 37){//left
+        			mouseLEFT();
+        		}
+        		if(event.which === 38){//up
+        			mouseUP();
+        		}
+        		if(event.which === 39){//right
+        			mouseRIGHT();
+        		}
+        		if(event.which === 40){//down
+        			mouseDOWN();
+        		}
+        	}
+        	            
+            function mouseLEFT(){
+            	var hasmove = false;//判断是否可以发生s移动，只有移动了才可以添加新元素
+            	for(var i = 0; i < arr[0].length; i++){
+            		if(arr[i][0] !== 0 && arr[i][1] !== 0 && arr[i][2] !== 0 && arr[i][3] !== 0 
+            			&& arr[i][0] !== arr[i][1] && arr[i][1] !== arr[i][2] && arr[i][2] !== arr[i][3]){
+            				hasmove = false;
+            				continue;
+            		}
+            		if(arr[i][0] !== 0 && arr[i][1] !== 0 && arr[i][2] !== 0 && arr[i][3] === 0 
+            			&& arr[i][0] !== arr[i][1] && arr[i][1] !== arr[i][2] ){
+           		 			hasmove = false;
+            				continue;
+            		}
+            		if(arr[i][0] !== 0 && arr[i][1] !== 0 && arr[i][2] === 0 && arr[i][3] === 0
+            			&& arr[i][0] !== arr[i][1]){
+           		 			hasmove = false;
+            				continue;
+            		}
+            		if(arr[i][1] === 0 && arr[i][2] === 0 && arr[i][3] === 0){
+           		 			hasmove = false;
+            				continue;
+            		}
+            		hasmove = true;
+            		break;
+            	}
+            
+	            //向上移动，一列一列，判断
+	            for(var i = 0; i < arr[0].length; i++){
+	            	for(var j = 0; j < 3; j++){
+		            	if(arr[i][0] === 0){
+		            		arr[i][0] = arr[i][1];
+		            		arr[i][1] = arr[i][2];
+		            		arr[i][2] = arr[i][3];
+		            		arr[i][3] = 0;
+		            	}
+		            	if(arr[i][1] === 0){
+		            		arr[i][1] = arr[i][2];
+		            		arr[i][2] = arr[i][3];
+		            		arr[i][3] = 0;
+		            	}
+		            	if(arr[i][2] === 0){
+		            		arr[i][2] = arr[i][3];
+		            		arr[i][3] = 0;
+		            	}
+	            	}
+	            	
+	            	if(arr[i][0] === arr[i][1]){
+	            		arr[i][0] = arr[i][1] * 2;
+	            		arr[i][1] = arr[i][2];
+	            		arr[i][2] = arr[i][3];
+	            		arr[i][3] = 0;
+	            	}
+	            	if(arr[i][1] === arr[i][2]){
+	            		arr[i][1] = arr[i][2] * 2;
+	            		arr[i][2] = arr[i][3];
+	            		arr[i][3] = 0;
+	            	}
+	            	if(arr[i][2] === arr[i][3]){
+	            		arr[i][2] = arr[i][3] * 2;
+	            		arr[i][3] = 0;
+	            	}
+	            	
+	            }
+            	if(isGameOver()){
+            		if(confirm("你死了，再来一次？")){
+            			gameStart();
+            		}else{
+            			stop = true;
+            			return;
+            		}
+            	}
+	            if(hasmove){
+	            	addNewNode();
+	            }
+	            drawNum();
+            }
+            
+            function mouseDOWN(){
+            	var hasmove = false;
+            	for(var i = 0; i < arr.length; i++){
+            		if(arr[3][i] !== 0 && arr[2][i] !== 0 && arr[1][i] !== 0 && arr[0][i] !== 0
+            			&& arr[3][i] !== arr[2][i] && arr[2][i] !== arr[1][i] && arr[1][i] !== arr[0][i]){
+            			hasmove = false;
+            			continue;
+            		}
+            		if(arr[3][i] !== 0 && arr[2][i] !== 0 && arr[1][i] !== 0 && arr[0][i] === 0
+            			&& arr[3][i] !== arr[2][i] && arr[2][i] !== arr[1][i]){
+            			hasmove = false;
+            			continue;
+            		}
+            		if(arr[3][i] !== 0 && arr[2][i] !== 0 && arr[1][i] === 0 && arr[0][i] === 0
+            			&& arr[3][i] !== arr[2][i]){
+            			hasmove = false;
+            			continue;
+            		}
+            		if(arr[2][i] === 0 && arr[1][i] === 0 && arr[0][i] === 0){
+            			hasmove = false;
+            			continue;
+            		}
+            		
+            		hasmove = true;
+            		break;
+            	}
+            	
+            	for(var i = 0; i < arr.length; i++){
+	            	for(var j=0; j < 3; j++){
+	            		if(arr[3][i] === 0){
+		            		arr[3][i] = arr[2][i];
+		            		arr[2][i] = arr[1][i];
+		            		arr[1][i] = arr[0][i];
+		            		arr[0][i] = 0;
+		            	}
+		            	if(arr[2][i] === 0){
+		            		arr[2][i] = arr[1][i];
+		            		arr[1][i] = arr[0][i];
+		            		arr[0][i] = 0;
+		            	}
+		            	
+		            	if(arr[1][i] === 0){
+		            		arr[1][i] = arr[0][i];
+		            		arr[0][i] = 0;
+		            	}
+	            	}
+	            	if(arr[3][i] === arr[2][i]){
+	            		arr[3][i] = arr[2][i] * 2;
+	            		arr[2][i] = arr[1][i];
+	            		arr[1][i] = arr[0][i];
+	            		arr[0][i] = 0;
+	            	}
+	            	if(arr[2][i] === arr[1][i]){
+	            		arr[2][i] = arr[1][i] * 2;
+	            		arr[1][i] = arr[0][i];
+	            		arr[0][i] = 0;
+	            	}
+	            	if(arr[1][i] === arr[0][i]){
+	            		arr[1][i] = arr[0][i] * 2;
+	            		arr[0][i] = 0;
+	            	}
+	            	
+	            }
+	            
+            	if(isGameOver()){
+            		if(confirm("你死了，再来一次？")){
+            			gameStart();
+            		}else{
+            			stop = true;
+            			return;
+            		}
+            	}
+	            if(hasmove){
+	            	addNewNode();
+	            }
+	            drawNum();
+            }
+            
+            function mouseUP(){
+            	var hasmove = false;
+            	for(var i = 0; i < arr.length; i++){
+            		if(arr[0][i] !== 0 && arr[1][i] !== 0 && arr[2][i] !== 0 && arr[3][i] !== 0
+            			&& arr[0][i] !== arr[1][i] && arr[1][i] !== arr[2][i] && arr[2][i] !== arr[3][i]){
+            			hasmove = false;
+            			continue;
+            		}
+            		if(arr[0][i] !== 0 && arr[1][i] !== 0 && arr[2][i] !== 0 && arr[3][i] === 0
+            			&& arr[0][i] !== arr[1][i] && arr[1][i] !== arr[2][i]){
+            			hasmove = false;
+            			continue;
+            		}
+            		if(arr[0][i] !== 0 && arr[1][i] !== 0 && arr[2][i] === 0 && arr[3][i] === 0
+            			&& arr[0][i] !== arr[1][i]){
+            			hasmove = false;
+            			continue;
+            		}
+            		if(arr[1][i] === 0 && arr[2][i] === 0 && arr[3][i] === 0){
+            			hasmove = false;
+            			continue;
+            		}
+            		hasmove = true;
+            		break;
+            	}
+            	
+            	for(var i = 0; i < arr.length; i++){
+	            	for(var j = 0; j < 3; j++){
+		            	if(arr[0][i] === 0){
+		            		arr[0][i] = arr[1][i];
+		            		arr[1][i] = arr[2][i];
+		            		arr[2][i] = arr[3][i];
+		            		arr[3][i] = 0;
+		            	}
+		            	if(arr[1][i] === 0){
+		            		arr[1][i] = arr[2][i];
+		            		arr[2][i] = arr[3][i];
+		            		arr[3][i] = 0;
+		            	}
+		            	if(arr[2][i] === 0){
+		            		arr[2][i] = arr[3][i];
+		            		arr[3][i] = 0;
+		            	}
+	            	}
+	            	if(arr[0][i] === arr[1][i]){
+	            		arr[0][i] = arr[1][i] * 2;
+	            		arr[1][i] = arr[2][i];
+	            		arr[2][i] = arr[3][i];
+	            		arr[3][i] = 0;
+	            	}
+	            	if(arr[1][i] === arr[2][i]){
+	            		arr[1][i] = arr[2][i] * 2;
+	            		arr[2][i] = arr[3][i];
+	            		arr[3][i] = 0;
+	            	}
+	            	if(arr[2][i] === arr[3][i]){
+	            		arr[2][i] = arr[3][i] * 2;
+	            		arr[3][i] = 0;
+	            	}
+	            	
+	            }
+	            
+            	if(isGameOver()){
+            		if(confirm("你死了，再来一次？")){
+            			gameStart();
+            		}else{
+            			stop = true;
+            			return;
+            		}
+            	}
+	            if(hasmove){
+	            	addNewNode();
+	            }
+	            drawNum();
+            }
+            
+            function mouseRIGHT(){
+            	var hasmove = false;
+            	for(var i = 0; i < arr[0].length; i++){
+            		if(arr[i][3] !== 0 && arr[i][2] !== 0 && arr[i][1] !== 0 && arr[i][0] !== 0
+            			&& arr[i][3] !== arr[i][2] && arr[i][2] !== arr[i][1] && arr[i][1] !== arr[i][0]){
+            			hasmove = false;
+            			continue;
+            		}
+            		if(arr[i][3] !== 0 && arr[i][2] !== 0 && arr[i][1] !== 0 && arr[i][0] === 0
+            			&& arr[i][3] !== arr[i][2] && arr[i][2] !== arr[i][1]){
+            			hasmove = false;
+            			continue;
+            		}
+            		if(arr[i][3] !== 0 && arr[i][2] !== 0 && arr[i][1] === 0 && arr[i][0] === 0
+            			&& arr[i][3] !== arr[i][2]){
+            			hasmove = false;
+            			continue;
+            		}
+            		if(arr[i][2] === 0 && arr[i][1] === 0 && arr[i][0] === 0){
+            			hasmove = false;
+            			continue;
+            		}
+            		
+            		hasmove = true;
+            		break;
+            	}
+            	
+            	for(var i = 0; i < arr[0].length; i++){
+	            	for(var j=0; j < 3; j++){
+	            		if(arr[i][3] === 0){
+		            		arr[i][3] = arr[i][2];
+		            		arr[i][2] = arr[i][1];
+		            		arr[i][1] = arr[i][0];
+		            		arr[i][0] = 0;
+		            	}
+		            	if(arr[i][2] === 0){
+		            		arr[i][2] = arr[i][1];
+		            		arr[i][1] = arr[i][0];
+		            		arr[i][0] = 0;
+		            	}
+		            	
+		            	if(arr[i][1] === 0){
+		            		arr[i][1] = arr[i][0];
+		            		arr[i][0] = 0;
+		            	}
+	            	}
+	            	if(arr[i][3] === arr[i][2]){
+	            		arr[i][3] = arr[i][2] * 2;
+	            		arr[i][2] = arr[i][1];
+	            		arr[i][1] = arr[i][0];
+	            		arr[i][0] = 0;
+	            	}
+	            	if(arr[i][2] === arr[i][1]){
+	            		arr[i][2] = arr[i][1] * 2;
+	            		arr[i][1] = arr[i][0];
+	            		arr[i][0] = 0;
+	            	}
+	            	if(arr[i][1] === arr[i][0]){
+	            		arr[i][1] = arr[i][0] * 2;
+	            		arr[i][0] = 0;
+	            	}
+	            	
+	            }
+	            
+            	if(isGameOver()){
+            		if(confirm("你死了，再来一次？")){
+            			gameStart();
+            		}else{
+            			stop = true;
+            			return;
+            		}
+            	}
+	            if(hasmove){
+	            	addNewNode();
+	            }
+	            drawNum();
+            }
+            
+            //移动完操作后，在为0的地方添加新的数字
+            function addNewNode(){
+            	while(true){
+            		var i = Math.floor(Math.random() * 4);
+            		var j = Math.floor(Math.random() * 4);
+            		if(i === 4)
+            			i = 3;
+            		if(j === 4)
+            			j = 3;
+            		
+            		if(arr[i][j] === 0){
+            			arr[i][j] = 2;
+            			break;
+            		}
+            	}
+            }
+            
+            function drawWall(){
+            	var context = getContext();
+            	for(var i = 0; i < 5; i++){
+            		context.beginPath();
+            		context.moveTo(0, i*100);
+            		context.lineTo(400, i*100);
+            		context.moveTo(i*100, 0);
+					context.lineTo(i*100, 400);
+					context.stroke();
+            		context.closePath();
+            	}
+            	
+            	drawNum();
+            }
+            
+            function getContext(){
+            	var canvas = document.getElementById("myCanvas");
+            	var context = canvas.getContext("2d");
+            	return context;
+            }
+            
+            function drawNum(){
+            	for(var i = 0; i < arr.length; i++){
+            		for(var j = 0; j < arr[i].length; j++){
+            		var context = getContext();
+            		context.clearRect(j*100 + 1, i*100 + 1, 98, 98);
+            			if(arr[i][j] !== 0){
+            				if(arr[i][j] === 2){
+            					context.fillStyle = "Moccasin";
+            				}
+            				if(arr[i][j] === 4){
+            					context.fillStyle = "Aquamarine";
+            				}
+            				if(arr[i][j] === 8){
+            					context.fillStyle = "PaleGreen";
+            				}
+            				if(arr[i][j] === 16){
+            					context.fillStyle = "LightBlue";
+            				}
+            				if(arr[i][j] === 32){
+            					context.fillStyle = "LightGrey";
+            				}
+            				if(arr[i][j] === 64){
+            					context.fillStyle = "LightSalmon";
+            				}
+            				if(arr[i][j] === 128){
+            					context.fillStyle = "IndianRed";
+            				}
+            				if(arr[i][j] === 256){
+            					context.fillStyle = "LemonChiffon";
+            				}
+            				if(arr[i][j] === 512){
+            					context.fillStyle = "HotPink";
+            				}
+            				if(arr[i][j] === 1024){
+            					context.fillStyle = "Fuchsia";
+            				}
+            				if(arr[i][j] === 2048){
+            					context.fillStyle = "Crimson";
+            				}
+            				if(arr[i][j] === 4096){
+            					context.fillStyle = "Brown";
+            				}
+            				if(arr[i][j] > 4096){
+            					context.fillStyle = "DarkRed";
+            				}
+            				context.fillRect(j*100 + 1, i*100 + 1, 98, 98);
+            				
+            				context.fillStyle = "black";
+            				if(arr[i][j] > 1000){
+            					context.font = "40px Courier New";
+            					context.fillText(arr[i][j], j*100, i*100+65);
+            				}else if(arr[i][j] > 100){
+            					context.font = "55px Courier New";
+            					context.fillText(arr[i][j], j*100, i*100+70);
+            				}else if(arr[i][j] > 10){
+            					context.font = "80px Courier New";
+            					context.fillText(arr[i][j], j*100+2, i*100+75);
+            				}else{
+            					context.font = "100px Courier New";
+            					context.fillText(arr[i][j], j*100+23, i*100+82);
+            				}
+            			}
+            		}
+            	}
+            	
+            }
+            
+            function isGameOver(){
+            	//判断是否含有0
+            	for(var i = 0; i < arr.length; i++){
+            		for(var j = 0; j < arr[i].length; j++){
+            			if(arr[i][j] === 0)
+            				return false;
+            		}
+            	}
+            	//判断是否还有相等的
+            	/*for(var i = 0; i < 3; i++){
+            		for(var j = 0; j < arr[i].length; j++){
+            			if(j > 2){
+            				if(arr[i][j] === arr[i+1][j]){
+            					return false;
+            				}
+            			}else{
+            				if(arr[i][j] === arr[i+1][j] || arr[i][j] === arr[i][j+1]){
+            					return false;
+            				}
+            			}
+            		}
+            	}*/
+            	return true;
+            }
+            
+            function gameStart(){
+            	arr = [
+	            	[0,0,0,0],
+	            	[0,0,0,0],
+	            	[0,0,0,0],
+	            	[0,2,0,2],
+	            ];
+	            drawNum();
+            }
+            var arr = [
+	            [0,0,0,0],
+	            [0,0,0,0],
+	            [0,0,0,0],
+	            [0,2,0,2],
+	        ];
+            
+            var stop = false;
+            drawWall();
+            gameStart();
+        </script>
+    </body>
+</html>

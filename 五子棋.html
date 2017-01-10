@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>五子棋</title>
+		<style>
+			body{
+				text-align: center;
+				background: url('./img/bg.jpg');;
+			}
+			canvas{
+				background: url('./img/background1.jpg');
+				box-shadow: 20px 20px 10px #888888;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Jeson五子棋</h1>
+		<canvas  id="drawBorder" height="750" width="750"></canvas>
+	<script>
+		var xDep = 750/15;
+		var yDep = 750/15;
+		var arr = new Array();
+		var isStop = false;
+		
+		function startGame(){
+			arr = new Array();
+			for(var i=0; i<15; i++){
+				arr[i] = new Array();
+				for(var j=0; j<15; j++){
+					arr[i][j] = 0;
+				}
+			}
+			isStop = false;
+			var canvas = document.getElementById("drawBorder");
+			if(canvas == null){
+				return;
+			}
+			var context = canvas.getContext("2d");
+			context.clearRect(0, 0, canvas.width, canvas.height);
+			drawWall("drawBorder");
+			
+		}
+		
+		function getContext(id){
+			var canvas = document.getElementById(id);
+			if(canvas == null){
+				return null;
+			}
+			var context = canvas.getContext("2d");
+			return context;
+		}
+		
+		function drawWall(){
+			var context = getContext("drawBorder");
+			context.beginPath();
+			for(var i = 0; i <= 15; i++){
+				context.moveTo(i*xDep, 0);
+				context.lineTo(i*xDep, 750);
+				
+				context.moveTo(0, i*yDep);
+				context.lineTo(750, i*yDep);
+				
+			}
+			context.closePath();
+			context.stroke();
+		}
+		
+		function drawPiece(i, j, callback){
+			var context = getContext("drawBorder");
+			var rg = context.createRadialGradient(i*xDep+27, j*yDep+23, 2, i*xDep+25, j*yDep+25, 23);
+			context.beginPath();
+			if(callback != null){
+				//context.fillStyle = "black";
+				rg.addColorStop(0.05, 'gray');
+				rg.addColorStop(1, 'black');
+			}else{
+				//context.fillStyle = "gray";
+				rg.addColorStop(0.05, 'white');
+				rg.addColorStop(1, 'gray');
+			}
+			context.fillStyle = rg;
+			context.arc(i*xDep+25, j*yDep+25, 23, 0, Math.PI*2, true);
+			context.fill();
+			context.closePath();
+			if(callback != null){
+				callback();
+			}
+		}
+		
+		function addClickEvent(){
+			var canvas = document.getElementById("drawBorder");
+			canvas.addEventListener('click',function(e){
+				if(isStop){
+					return;
+				}
+				var i = Math.floor(e.layerX/xDep);
+				var j = Math.floor(e.layerY/yDep);
+				if(arr[i][j] != 0){
+					return;
+				}
+				drawPiece(i, j, function(){
+					arr[i][j] = 2;
+					if(hasWiner() == 2){
+						if(true === confirm("恭喜你贏了,是否再戰")){
+							startGame()
+						}else{
+							isStop = true;
+						}
+					}
+					computerPlay();
+				});
+			});
+			canvas.focus();
+		}
+		
+		function computerPlay(){
+			var max = 0;
+			var position = 0;
+			for(var i=0; i<arr.length; i++){
+				for(var j=0; j<arr[i].length; j++){
+					if(arr[i][j] == 0){
+						var score = getScore(i, j);
+						if(max < score){
+							max = score;
+							position = i*15 + j;
+						}
+					}
+				}
+			}
+			var i = Math.floor(position/15);
+			var j = position%15;
+			drawPiece(i,j);
+			arr[i][j] = 1;
+			if(hasWiner() == 1){
+				if(true === confirm("小菜鳥，你輸了！再虐一盤！")){
+					startGame();
+				}else{
+					isStop = true;
+				}
+			}
+		}
+		
+		function getScore(i, j){
+			var str = "";
+			var currentScore = 0;
+			//水平
+			for(var m = j-4; m <= j; m++){
+				if(m<0 || m>10){
+					continue;
+				}
+				for(var n=0; n<5; n++){
+					str += arr[i][m+n];
+				}
+				currentScore += getCurrentScore(str);
+				str = "";
+			}
+			str = "";
+			//垂直
+			for(var m = i-4; m<=i; m++){
+				if(m<0 || m>10){
+					continue;
+				}
+				for(var n=0; n<5; n++){
+					str += arr[m+n][j];
+				}
+				currentScore += getCurrentScore(str);
+				str="";
+			}
+			str = "";
+			//斜下
+			for(var m = i-4,n=j-4; m<=i; m++,n++){
+				if(m<0 || m>10 || n<0 || n>10){
+					continue;
+				}
+				for(var l = 0; l<5; l++){
+					str += arr[m+l][n+l];
+				}
+				currentScore += getCurrentScore(str);
+				str="";
+			}
+			str = "";
+			//斜上
+			for(var m = i-4,n=j+4; m<=i; m++,n--){
+				if(m<0 || m>10 || n<4 || n>14){
+					continue;
+				}
+				for(var l = 0; l<5; l++){
+					str += arr[m+l][n-l];
+				}
+				currentScore += getCurrentScore(str);
+				str="";
+			}
+			str = "";
+			
+			return currentScore;
+		}
+		
+		function getCurrentScore(str){
+			var r = new RegExp("0","gi");
+			var zero = str.match(r) === null ? 0 : str.match(r).length;
+			r = new RegExp("1","gi");
+			var one = str.match(r) === null ? 0 : str.match(r).length;
+			r = new RegExp("2","gi");
+			var two = str.match(r) === null ? 0 : str.match(r).length;
+			
+			var score = 0;
+			if(zero === 5){
+				score = 7;
+			}
+			if(zero + one === 5){
+				if(one === 1 ){
+					score = 35;
+				}
+				if(one === 2){
+					score = 800;
+				}
+				if(one === 3){
+					score = 15000;
+				}
+				if(one === 4){
+					score = 800000;
+				}
+			}
+			if(two + zero === 5){
+				if(two === 1){
+					score = 15;
+				}
+				if(two === 2){
+					score = 400;
+				}
+				if(two === 3){
+					score = 1800;
+				}
+				if(two === 4){
+					score = 100000;
+				}
+			}
+			
+			return score;
+		}
+		
+		//判斷是否有勝者
+		function hasWiner(){
+			for(var i = 2; i < arr.length - 2; i++){
+				for(var j = 2; j < arr[i].length - 2; j++){
+					if(arr[i][j] === 0){
+						continue;
+					}
+					
+					if(arr[i][j] === 1){
+						if(arr[i-2][j-2] === 1 && arr[i-1][j-1] === 1 && arr[i+1][j+1] === 1 && arr[i+2][j+2] === 1){
+							return 1;
+						}
+						if(arr[i-2][j+2] === 1 && arr[i-1][j+1] === 1 && arr[i+1][j-1] === 1 && arr[i+2][j-2] === 1){
+							return 1;
+						}
+						if(arr[i-2][j] === 1 && arr[i-1][j] === 1 && arr[i+1][j] === 1 && arr[i+2][j] === 1){
+							return 1;
+						}
+						if(arr[i][j-2] === 1 && arr[i][j-1] === 1 && arr[i][j+1] === 1 && arr[i][j+2] === 1){
+							console.log('dddd');
+							return 1;
+						}
+					}
+					if(arr[i][j] === 2){
+						if(arr[i-2][j-2] === 2 && arr[i-1][j-1] === 2 && arr[i+1][j+1] === 2 && arr[i+2][j+2] === 2){
+							return 2;
+						}
+						if(arr[i-2][j+2] === 2 && arr[i-1][j+1] === 2 && arr[i+1][j-1] === 2 && arr[i+2][j-2] === 2){
+							return 2;
+						}
+						if(arr[i-2][j] === 2 && arr[i-1][j] === 2 && arr[i+1][j] === 2 && arr[i+2][j] === 2){
+							return 2;
+						}
+						if(arr[i][j-2] === 2 && arr[i][j-1] === 2 && arr[i][j+1] === 2 && arr[i][j+2] === 2){
+							return 2;
+						}
+					}
+				}
+			}
+		}
+		
+		startGame();
+		addClickEvent();
+	</script>
+	</body>
+</html>
