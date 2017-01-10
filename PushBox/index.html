@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>推箱子</title>
+	<style type="text/css">
+		body{
+			text-align: center;
+		}
+		#canvas {
+			margin-top: 100px;
+			border: 1px solid aquamarine;
+		}
+		.btn-group {
+			position: absolute;
+			margin: 10px;
+			left: 80px;
+			top: 90px;
+		}
+		.btn {
+			width: 100px;
+			background: deepskyblue;
+			box-shadow: 3px 4px rgba(0, 0, 0, 0.5);
+			-webkit-box-shadow: 3px 4px rgba(0, 0, 0, 0.5);
+			border-radius: 4px;
+			margin: 10px;
+			padding: 10px;
+		}
+		.btn:hover{
+			cursor: pointer;
+		}
+		.btn:active{
+			margin-left: 14px;
+			margin-top: 13px;
+			box-shadow: 0px 0px rgba(0, 0, 0, 0.5);
+			-webkit-box-shadow: 0px 0px rgba(0, 0, 0, 0.5);
+		}
+	</style>
+</head>
+<body onkeydown="onKeyDown(event);">
+	<div class="btn-group">
+		<div class="btn" onclick="nextGame();">下一局</div>
+		<div class="btn" onclick="reStart();">重新开始</div>
+	</div>
+	<canvas id="canvas" width="700" height="500">
+		您的浏览器不支持
+	</canvas>
+<script type="text/javascript" src="map.js"></script>
+<script type="text/javascript">
+	/*
+	 * 0  空白
+	 * 1  墙        wall
+	 * 2  乌龟    tor
+	 * 3 箱子     box
+	 * 4 目的地 aim
+	 * */
+	var canvas = document.getElementById("canvas");
+	var ctx = canvas.getContext("2d");
+	var M = new Map();
+	var map,aimmap;
+	var level = 1;
+	var isWin = false;
+	var wallImg = new Image(),
+		torImg = new Image(),
+		boxImg = new Image(),
+		aimImg = new Image();
+	wallImg.src = "images/wall.png";
+	torImg.src = "images/tortoise.png";
+	boxImg.src = "images/box.png";
+	aimImg.src = "images/aims.png";
+	var imgs = [wallImg,torImg,boxImg,aimImg];
+	loadImg(imgs,function(){
+		startGame();
+	});
+	function loadImg(sources, callback){
+		var count=0,
+			imgNum = sources.length,
+			i;
+		for(i=0; i < imgNum; i++){
+			sources[i].onload = function(){
+				if(++count >= imgNum)
+					callback();
+			}
+		}
+	}
+	function startGame(){
+		isWin = false;
+		map = M.getMap(level);
+		//采用深度复制
+		aimmap = new Array();
+		var i;
+		for(i=0; i<map.length; i++){
+			aimmap[i] = map[i].concat();
+		}
+		drawMap();
+	}
+	function drawMap(){
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		ctx.beginPath();
+		var i,j;
+		for(i=0;i<aimmap.length;i++){
+			for(j=0;j<aimmap[i].length;j++){
+				if(aimmap[i][j] === 4)
+					ctx.drawImage(aimImg, j*wallImg.width, i*wallImg.height, wallImg.width, wallImg.height);
+			}
+		}
+		for(i=0;i<map.length;i++){
+			for(j=0;j<map[i].length;j++){
+				if(map[i][j] === 1)
+					ctx.drawImage(wallImg, j*wallImg.width, i*wallImg.height, wallImg.width, wallImg.height);
+				if(map[i][j] === 2)
+					ctx.drawImage(torImg, j*wallImg.width, i*wallImg.height, wallImg.width, wallImg.height);
+				if(map[i][j] === 3)
+					ctx.drawImage(boxImg, j*wallImg.width, i*wallImg.height, wallImg.width, wallImg.height);
+				if(map[i][j] === 4)
+					ctx.drawImage(aimImg, j*wallImg.width, i*wallImg.height, wallImg.width, wallImg.height);
+				if(map[i][j] === 5)
+					ctx.drawImage(boxImg, j*wallImg.width, i*wallImg.height, wallImg.width, wallImg.height);
+			}
+		}
+		ctx.closePath();
+	}
+	function onKeyDown(event){
+		if(isWin) return;
+		if(event.which === 37){//left
+	    	moveTor('LEFT');
+	   	}
+		if(event.which === 38){//DOWN
+	    	moveTor('UP');
+	    }
+	    if(event.which === 39){//right
+	    	moveTor('RIGHT');
+	    }
+	    if(event.which === 40){//down
+	    	moveTor('DOWN');
+	    }
+	}
+	function moveTor(dir){
+		var pos = getTorLocation();
+		var i = pos.i;
+		var j = pos.j;
+		if(dir === "UP"){
+			if(map[i-1][j] === 1){
+				return false;
+			}
+			if(map[i-1][j] === 3){
+				if(map[i-2][j] === 1 || map[i-2][j] === 3){
+					return false;
+				}
+				map[i-2][j] = 3;
+				map[i-1][j] = 2;
+				map[i][j] = 0;
+			}
+			else{
+				map[i-1][j] = 2;
+				map[i][j] = 0;
+			}
+		}
+		if(dir === "DOWN"){
+			if(map[i+1][j] === 1){
+				return false;
+			}
+			if(map[i+1][j] === 3){
+				if(map[i+2][j] === 1 || map[i+2][j] === 3){
+					return false;
+				}
+				map[i+2][j] = 3;
+				map[i+1][j] = 2;
+				map[i][j] = 0;
+			}else{
+				map[i+1][j] = 2;
+				map[i][j] = 0;
+			}
+		}
+		if(dir === "LEFT"){
+			if(map[i][j-1] === 1){
+				return false;
+			}
+			if(map[i][j-1] === 3){
+				if(map[i][j-2] === 1 || map[i][j-2] === 3){
+					return false;
+				}
+				map[i][j-2] = 3;
+				map[i][j-1] = 2;
+				map[i][j] = 0;
+			}else{
+				map[i][j-1] = 2;
+				map[i][j] = 0;
+			}
+		}
+		if(dir === "RIGHT"){
+			if(map[i][j+1] === 1){
+				return false;
+			}
+			if(map[i][j+1] === 3){
+				if(map[i][j+2] === 1 || map[i][j+2] === 3){
+					return false;
+				}
+				map[i][j+2] = 3;
+				map[i][j+1] = 2;
+				map[i][j] = 0;
+			}else{
+				map[i][j+1] = 2;
+				map[i][j] = 0;
+			}
+		}
+		
+		drawMap();
+		if(isFinish()){
+			if(confirm("你赢了，是否继续？")){
+				nextGame();
+			}
+		}
+	}
+	function getTorLocation(){
+		var i,j;
+		for(i=0;i<map.length;i++){
+			for(j=0;j<map[i].length;j++){
+				if(map[i][j] === 2){
+					return {i:i,j:j};
+				}
+			}
+		}
+	}
+	function isFinish(){
+		for(i=0;i<aimmap.length;i++){
+			for(j=0;j<aimmap[i].length;j++){
+				if(aimmap[i][j] === 4){
+					if(map[i][j] !== 3){
+						return false;
+					}
+				}
+			}
+		}
+		isWin = true;
+		return true;
+	}
+	function reStart(){
+		isWin = false;
+		map = new Array();
+		var i;
+		for(i=0; i<aimmap.length; i++){
+			map[i] = aimmap[i].concat();
+		}
+		drawMap();
+	}
+	function nextGame(){
+		if(++level > M.maps.length)
+			level = 1;
+		startGame(level);
+	}
+</script>
+</body>
+</html>
