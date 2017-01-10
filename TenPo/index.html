@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>TenPo</title>
+	<style type="text/css">
+		body {
+			text-align: center;
+		}
+		#canvas {
+			background: #EEE;
+			margin-top: 20px;
+			border-radius: 4px;
+			box-shadow: 10px 10px rgba(30, 30, 30, 0.5);
+		}
+		#control{
+			position: absolute;
+			right: 200px;
+			top: 30px;
+			padding: 15px;
+			border-radius: 5px;
+			box-shadow: 8px 8px rgba(30, 30, 30, 0.5);
+			background: gray;
+			color: antiquewhite;
+			width: 100px;
+		}
+	</style>
+</head>
+<body onkeydown="onKeyDown(event);">
+	<!--
+	/*
+ 	* 游戏说明： 游戏开始时，卡片落下，当落下停止时
+ 	* 其数字与相邻数字相加之和为10，便消除
+ 	* */
+ 	-->
+	<canvas id="canvas" width="500" height="750">
+		您的浏览器太老了
+	</canvas>
+	<div id="control">
+		分数
+		<h1 id="score">0</h1>
+	</div>
+<script type="text/javascript">
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+var scorePane = document.getElementById("score");
+var map;
+var row,col;
+var box;
+var count,speed,score;
+startGame();
+function startGame(){
+	map = [
+		[0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0],
+		[0, 0, 0, 0, 0, 0]
+	];
+	row = canvas.height/map.length,
+	col = canvas.width/map[0].length;
+	box = getBox();
+	count = 0;
+	speed = 500;
+	score = 0;
+	drawWall();
+	drawMap();
+	drawBox();
+	cycle();
+}
+function cycle(){
+	setTimeout(function(){
+		if(!moveBox("DOWN")){
+			box = getBox();
+			count += 1;
+			if(isGameOver()){
+				map = 0;
+				row = 0;
+				col = 0;
+				count = 0;
+				speed = 0;
+				box = null;
+				score = 0;
+				if(confirm("你输了，再来一次??")){
+					startGame();	
+				}
+				return;
+			}
+		}
+		speed = 500 - Math.floor(count/5)*30;
+		speed = speed <= 100 ? 100 : speed;
+		drawMap();
+		drawBox();
+		cycle();
+	}, speed);
+}
+
+function getBox(){
+	var num = Math.floor(Math.random() * 7) + 2;
+	num = (num === 9 ? 8 : num);
+	return {
+		num: num,
+		x: 0,
+		y: 3
+	}
+}
+
+function drawWall(){
+	var i,j;
+	ctx.beginPath();
+	ctx.strokeStyle = "grey";
+	for(i=0; i<map.length; i++){
+		for(j=0;j<map[i].length;j++){
+			ctx.moveTo(0, i*row);
+			ctx.lineTo(canvas.width, i*row);
+			ctx.moveTo(j*col, 0);
+			ctx.lineTo(j*col, canvas.height);
+		}
+	}
+	ctx.stroke();
+	ctx.closePath();
+}
+function drawMap(){
+	var i,j;
+	ctx.beginPath();
+	ctx.font = "60px Courier New";
+	for(i=0;i<map.length;i++){
+		for(j=0;j<map[0].length;j++){
+			if(map[i][j] === 0){
+				ctx.clearRect(j*col+1,i*row+1,col-2,row-2);
+			}
+			if(map[i][j] !== 0){
+				if(map[i][j] === 2){
+            		ctx.fillStyle = "Moccasin";
+            	}
+            	if(map[i][j] === 3){
+            		ctx.fillStyle = "Aquamarine";
+            	}
+            	if(map[i][j] === 4){
+            		ctx.fillStyle = "PaleGreen";
+            	}
+            	if(map[i][j] === 5){
+            		ctx.fillStyle = "LightBlue";
+            	}
+            	if(map[i][j] === 6){
+            		ctx.fillStyle = "LightGrey";
+            	}
+            	if(map[i][j] === 7){
+            		ctx.fillStyle = "LightSalmon";
+            	}
+            	if(map[i][j] === 8){
+            		ctx.fillStyle = "IndianRed";
+            	}
+            	ctx.fillRect(j*col+1,i*row+1,col-2,row-2);
+            	ctx.fillStyle = "black";
+            	ctx.fillText(map[i][j], j*col+23, (i+1)*row-20);
+			}
+		}
+	}
+	ctx.closePath();
+}
+function drawBox(){
+	ctx.beginPath();
+	var num = box.num;
+	var i = box.x;
+	var j = box.y;
+	if(num === 2){
+    	ctx.fillStyle = "Moccasin";
+    }
+    if(num === 3){
+        ctx.fillStyle = "Aquamarine";
+    }
+    if(num === 4){
+    	ctx.fillStyle = "PaleGreen";
+    }
+    if(num === 5){
+    	ctx.fillStyle = "LightBlue";
+    }
+    if(num === 6){
+        ctx.fillStyle = "LightGrey";
+    }
+    if(num === 7){
+        ctx.fillStyle = "LightSalmon";
+    }
+    if(num === 8){
+        ctx.fillStyle = "IndianRed";
+    }
+    ctx.fillRect(j*col+1,i*row+1,col-2,row-2);
+    ctx.fillStyle = "black";
+    ctx.fillText(num, j*col+23, (i+1)*row-20);
+	ctx.closePath();
+}
+function isPo(){
+	var flag = false;
+	if(box.y>0){
+		if(map[box.x][box.y-1] + box.num === 10){
+			map[box.x][box.y-1] = 0;
+			flag = true;
+			score += 10;
+		}
+	}
+	if(box.y+1<map[0].length){
+		if(map[box.x][box.y+1] + box.num === 10){
+			map[box.x][box.y+1] = 0;
+			flag = true;
+			score += 10;
+		}
+	}
+	if(box.x+1<map.length){
+		if(map[box.x+1][box.y] + box.num === 10){
+			map[box.x+1][box.y] = 0;
+			flag = true;
+			score += 10;
+		}
+	}
+	if(flag){
+		map[box.x][box.y] = 0;
+		scorePane.innerHTML = score;
+	}	
+}
+function moveBox(dir){
+	if(dir === "DOWN"){
+		if(box.x+2 > map.length){
+			map[box.x][box.y] = box.num;
+			isPo();
+			return false;
+		}
+		if(map[box.x+1][box.y] !== 0){
+			map[box.x][box.y] = box.num;
+			isPo();
+			return false;
+		}
+		box.x++;
+	}
+	if(dir === "LEFT"){
+		if(box.y-1<0)
+			return false;
+		if(map[box.x][box.y-1] !== 0)
+			return false;
+		box.y--;
+	}
+	if(dir === "RIGHT"){
+		if(box.y+2>map[0].length)
+			return false;
+		if(map[box.x][box.y+1] !== 0)
+			return false;
+		box.y++;
+	}
+	return true;
+}
+function onKeyDown(event){
+	var flag;
+    if(event.which === 37){//left
+    	flag = moveBox('LEFT');
+   	}
+    if(event.which === 39){//right
+    	flag = moveBox('RIGHT');
+    }
+    if(event.which === 40){//down
+    	//flag = moveBox('DOWN');
+    }
+    if(flag){
+    	drawMap();
+    	drawBox();
+    }
+}
+function isGameOver(){
+	var i;
+	for(i=0;i<map[0].length;i++){
+		if(map[0][i] !== 0){
+			return true;
+		}
+	}
+	return false;
+}
+</script>
+</body>
+</html>
