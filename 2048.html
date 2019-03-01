@@ -29,6 +29,42 @@
     	<hr/>
         <canvas id="myCanvas" class="center" width="400" height="400" >您的浏览器不支持 HTML5 canvas 标签。</canvas>
         <script>
+			let body = document.getElementsByTagName('body')[0];
+			body.addEventListener('touchstart', touchStart, false);
+			body.addEventListener('touchend', touchEnd, false);
+			let g_point = {
+				x: 0,
+				y: 0
+			} 
+			function touchStart(e){
+				let touch = e.touches[0];
+				g_point.x = touch.clientX;
+				g_point.y = touch.clientY;
+			}
+			function touchEnd(e){
+				e.preventDefault();
+				let end = e.changedTouches[0];
+				let x = end.clientX - g_point.x;
+				let y = end.clientY - g_point.y;
+				if(Math.abs(x) > Math.abs(y)){
+					if(x > 0){
+						mouseRIGHT();
+					}else{
+						mouseLEFT();
+					}
+				}else{
+					if(y > 0){
+						mouseDOWN();
+					}else{
+						mouseUP();
+					}
+				}
+
+				g_point = {
+					x: 0,
+					y: 0
+				} 
+			}
         	function keydown(event){
         		if(stop){
         			return false;

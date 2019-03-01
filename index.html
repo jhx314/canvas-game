@@ -5,14 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Jeson Game</title>
+    <style>
+        body{
+            background: url('./img/title/bg.jpg');
+            background-size: cover;
+        }
+        a {
+            text-decoration: none;
+        }
+        h1{
+            text-align: center;
+        }
+        .games {
+            text-align: center;
+        }
+        .pane{
+            display: inline-block;
+            width: 200px;
+            height: 240px;
+            box-shadow: 0px 0px 10px 0px grey;
+            padding: 2px;
+            border-radius: 5px;
+            margin: 5px;
+            background: bisque;
+        }
+        .pane>img{
+            width: 200px;
+            height: 200px;
+        }
+        .pane > .title{
+            text-align: center;
+            line-height: 36px;
+        }
+    </style>
 </head>
 <body style="padding: 10px">
-    <article>
-        <section><a href="2048.html">2048</a></section>
-        <section><a href="拼图.html">拼图</a></section>
-        <section><a href="五子棋.html">五子棋</a></section>
-        <section><a href="TenPo/index.html">十消</a></section>
-        <section><a href="PushBox/index.html">推箱子</a></section>
-    </article>
+    <h1>Jeson Game</h1>
+	<div class="games">
+		<div class="pane">
+            <img src="./img/title/2048.jpg">
+            <div class="title">
+                <a href="./2048.html">2048</a>
+            </div>
+        </div>
+		<div class="pane">
+            <img src="./img/title/splitimg.jpg">
+            <div class="title">
+                <a href="./拼图.html">拼图</a>
+            </div>
+        </div>
+		<div class="pane">
+            <img src="./img/title/five.jpg">
+            <div class="title">
+                <a href="./五子棋.html">五子棋</a>
+            </div>
+        </div>
+		<div class="pane">
+            <img src="./img/title/pushbox.jpg">
+            <div class="title">
+                <a href="./PushBox/index.html">推箱子</a>
+            </div>
+        </div>
+		<div class="pane">
+            <img src="./img/title/ten.jpg">
+            <div class="title">
+                <a href="./TenPo/index.html">十消</a>
+            </div>
+        </div>
+	</div>
 </body>
 </html>

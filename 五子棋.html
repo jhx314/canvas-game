@@ -112,6 +112,33 @@
 				});
 			});
 			canvas.focus();
+
+			let body = document.getElementsByTagName('body')[0];
+			body.addEventListener('touchend', touchEnd, false);
+		}
+		
+		function touchEnd(e){
+			e.preventDefault();
+			let end = e.changedTouches[0];
+			if(isStop){
+				return;
+			}
+			var i = Math.floor(end.pageX/xDep);
+			var j = Math.floor(end.pageY/yDep);
+			if(arr[i][j] != 0){
+				return;
+			}
+			drawPiece(i, j, function(){
+				arr[i][j] = 2;
+				if(hasWiner() == 2){
+					if(true === confirm("恭喜你贏了,是否再戰")){
+						startGame()
+					}else{
+						isStop = true;
+					}
+				}
+				computerPlay();
+			});
 		}
 		
 		function computerPlay(){

@@ -63,6 +63,9 @@
     	</div>
         <canvas id="myCanvas" width="1000" height="600">您的浏览器不支持 HTML5 canvas 标签。</canvas>
         <script>
+			let body = document.getElementsByTagName('body')[0];
+			body.addEventListener('touchstart', touchStart, false);
+			body.addEventListener('touchend', touchEnd, false);
         	function selectPic(pic){
         		if(hasClass(pic, 'selected')){
         			return;
@@ -158,6 +161,39 @@
 	            	context.fillText("COMPLETE", 400, 80);
             	}
             }
+			let g_point = {
+				x: 0,
+				y: 0
+			} 
+			function touchStart(e){
+				let touch = e.touches[0];
+				g_point.x = touch.clientX;
+				g_point.y = touch.clientY;
+			}
+			function touchEnd(e){
+				e.preventDefault();
+				let end = e.changedTouches[0];
+				let x = end.clientX - g_point.x;
+				let y = end.clientY - g_point.y;
+				if(Math.abs(x) > Math.abs(y)){
+					if(x > 0){
+						moveRIGHT();
+					}else{
+						moveLEFT();
+					}
+				}else{
+					if(y > 0){
+						moveDOWN();
+					}else{
+						moveUP();
+					}
+				}
+
+				g_point = {
+					x: 0,
+					y: 0
+				} 
+			}
             
             function keydown(event){
             	if(isComplete() === true){

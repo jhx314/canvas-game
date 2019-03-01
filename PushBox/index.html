@@ -54,6 +54,9 @@
 	 * 3 箱子     box
 	 * 4 目的地 aim
 	 * */
+	let body = document.getElementsByTagName('body')[0];
+	body.addEventListener('touchstart', touchStart, false);
+	body.addEventListener('touchend', touchEnd, false);
 	var canvas = document.getElementById("canvas");
 	var ctx = canvas.getContext("2d");
 	var M = new Map();
@@ -120,6 +123,39 @@
 		}
 		ctx.closePath();
 	}
+	let g_point = {
+		x: 0,
+		y: 0
+	} 
+	function touchStart(e){
+		let touch = e.touches[0];
+		g_point.x = touch.clientX;
+		g_point.y = touch.clientY;
+	}
+	function touchEnd(e){
+		e.preventDefault();
+		let end = e.changedTouches[0];
+		let x = end.clientX - g_point.x;
+		let y = end.clientY - g_point.y;
+		if(Math.abs(x) > Math.abs(y)){
+			if(x > 0){
+				moveTor('RIGHT');
+			}else{
+				moveTor('LEFT');
+			}
+		}else{
+			if(y > 0){
+				moveTor('DOWN');
+			}else{
+				moveTor('UP');
+			}
+		}
+
+		g_point = {
+			x: 0,
+			y: 0
+		} 
+	}
 	function onKeyDown(event){
 		if(isWin) return;
 		if(event.which === 37){//left
@@ -135,6 +171,7 @@
 	    	moveTor('DOWN');
 	    }
 	}
+
 	function moveTor(dir){
 		var pos = getTorLocation();
 		var i = pos.i;
@@ -207,6 +244,7 @@
 		
 		drawMap();
 		if(isFinish()){
+			drawMap();
 			if(confirm("你赢了，是否继续？")){
 				nextGame();
 			}
