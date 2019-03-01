@@ -6,6 +6,9 @@
         <title>拼图</title>
 
         <style>
+			html, body{
+				height: 100%;
+			}
         	body{
         		text-align: center;
         		background: url("./img/bg.jpg");
@@ -63,7 +66,7 @@
     	</div>
         <canvas id="myCanvas" width="1000" height="600">您的浏览器不支持 HTML5 canvas 标签。</canvas>
         <script>
-			let body = document.getElementsByTagName('body')[0];
+			let body = document.getElementsByTagName('canvas')[0];
 			body.addEventListener('touchstart', touchStart, false);
 			body.addEventListener('touchend', touchEnd, false);
         	function selectPic(pic){
@@ -166,6 +169,7 @@
 				y: 0
 			} 
 			function touchStart(e){
+				e.preventDefault();
 				let touch = e.touches[0];
 				g_point.x = touch.clientX;
 				g_point.y = touch.clientY;
