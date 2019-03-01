@@ -4,24 +4,28 @@
 	<meta charset="UTF-8">
 	<title>推箱子</title>
 	<style type="text/css">
+		html, body{
+			height: 100%;
+		}
 		body{
 			text-align: center;
 		}
 		#canvas {
-			margin-top: 100px;
+			margin-top: 10px;
 			border: 1px solid aquamarine;
 		}
 		.btn-group {
-			position: absolute;
-			margin: 10px;
-			left: 80px;
-			top: 90px;
+			margin-top: 20px;
+			text-align: center;
+		}
+		.btn-group>div{
+			display: inline-block;
 		}
 		.btn {
 			width: 100px;
 			background: deepskyblue;
-			box-shadow: 3px 4px rgba(0, 0, 0, 0.5);
-			-webkit-box-shadow: 3px 4px rgba(0, 0, 0, 0.5);
+			box-shadow: 1px 1px 2px 2px #c3c7c7;
+			-webkit-box-shadow: 1px 1px 2px 2px #c3c7c7;
 			border-radius: 4px;
 			margin: 10px;
 			padding: 10px;
@@ -38,13 +42,13 @@
 	</style>
 </head>
 <body onkeydown="onKeyDown(event);">
+	<canvas id="canvas" width="700" height="500">
+		您的浏览器不支持
+	</canvas>
 	<div class="btn-group">
 		<div class="btn" onclick="nextGame();">下一局</div>
 		<div class="btn" onclick="reStart();">重新开始</div>
 	</div>
-	<canvas id="canvas" width="700" height="500">
-		您的浏览器不支持
-	</canvas>
 <script type="text/javascript" src="map.js"></script>
 <script type="text/javascript">
 	/*
@@ -128,6 +132,7 @@
 		y: 0
 	} 
 	function touchStart(e){
+		e.preventDefault();
 		let touch = e.touches[0];
 		g_point.x = touch.clientX;
 		g_point.y = touch.clientY;
