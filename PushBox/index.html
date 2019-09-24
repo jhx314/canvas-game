@@ -7,8 +7,9 @@
 		html, body{
 			height: 100%;
 		}
-		body{
+		.root-body{
 			text-align: center;
+			overflow: hidden;
 		}
 		#canvas {
 			margin-top: 10px;
@@ -41,7 +42,7 @@
 		}
 	</style>
 </head>
-<body onkeydown="onKeyDown(event);">
+<body class="root-body" onkeydown="onKeyDown(event);">
 	<canvas id="canvas" width="700" height="500">
 		您的浏览器不支持
 	</canvas>
