@@ -12,6 +12,7 @@
         	body{
         		text-align: center;
         		background: url("./img/bg.jpg");
+				overflow: hidden;
         	}
         	div{
         		height: 160px;
@@ -101,9 +102,9 @@
 			/***************/
         	
         	var arr = [
-        		[3,2,1],
-        		[6,7,0],
-        		[5,8,4]
+        		[0,3,6],
+        		[1,4,7],
+        		[2,5,8]
         	];
         	var step = 0;
         	var imgSrc = "img/001.jpg";
@@ -307,7 +308,7 @@
             function startGame(){
             	draw("myCanvas");
             	step = 0;
-            	createArr();
+            	//createArr();
             	drawSplitImg();
             }
             
