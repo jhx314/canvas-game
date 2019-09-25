@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Jeson Game</title>
+    <title>Yungyu Game</title>
     <style>
         body{
             background: url('./img/title/bg.jpg');
@@ -21,13 +21,13 @@
         }
         .pane{
             display: inline-block;
-            width: 200px;
-            height: 240px;
+            /* width: 200px; */
+            /* height: 240px; */
             box-shadow: 0px 0px 10px 0px grey;
-            padding: 2px;
-            border-radius: 5px;
+            /* padding: 2px; */
+            /* border-radius: 5px; */
             margin: 5px;
-            background: bisque;
+            /* background: bisque; */
         }
         .pane>img{
             width: 200px;
@@ -36,42 +36,43 @@
         .pane > .title{
             text-align: center;
             line-height: 36px;
+            display: none;
         }
     </style>
 </head>
 <body style="padding: 10px">
-    <h1>Jeson Game</h1>
+    <h1>Yungyu Game</h1>
 	<div class="games">
-		<div class="pane">
+		<a class="pane" href="./2048.html">
             <img src="./img/title/2048.jpg">
             <div class="title">
-                <a href="./2048.html">2048</a>
+                <span>2048</span>
             </div>
-        </div>
-		<div class="pane">
+        </a>
+		<a class="pane" href="./拼图.html">
             <img src="./img/title/splitimg.jpg">
             <div class="title">
-                <a href="./拼图.html">拼图</a>
+                <span>拼图</span>
             </div>
-        </div>
-		<div class="pane">
+        </a>
+		<a class="pane" href="./五子棋.html">
             <img src="./img/title/five.jpg">
             <div class="title">
-                <a href="./五子棋.html">五子棋</a>
+                <span>五子棋</span>
             </div>
-        </div>
-		<div class="pane">
+        </a>
+		<a class="pane" href="./PushBox/index.html">
             <img src="./img/title/pushbox.jpg">
             <div class="title">
-                <a href="./PushBox/index.html">推箱子</a>
+                <span>推箱子</span>
             </div>
-        </div>
-		<div class="pane">
+        </a>
+		<a class="pane" href="./TenPo/index.html">
             <img src="./img/title/ten.jpg">
             <div class="title">
-                <a href="./TenPo/index.html">十消</a>
+                <span>十消</span>
             </div>
-        </div>
-	</div>
+        </a>
+    </div>
 </body>
 </html>
