@@ -77,5 +77,18 @@
             </div>
         </a>
     </div>
+<script src="./js/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(()=>{
+    rotate()
+});
+
+function rotate () {
+    let arr = document.getElementsByClassName('pane')
+    for (var i = 0; i < arr.length; i++) {
+        arr.item(i).style.transform=`rotate(${Math.random()*45 - 22.5}deg)`
+    }
+}
+</script>
 </body>
 </html>
